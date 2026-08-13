@@ -1,0 +1,63 @@
+image:
+  registry: "local"          # must be non-empty; the chart renders "registry/repository:tag"
+  repository: testrepo
+  tag: latest
+  pullPolicy: Never          # never pull — use the local Docker image as-is
+
+invenio:
+  hostname: localhost        # must match the hostname you browse to
+  init: true                 # runs db init, index init, admin role creation on install
+  demo_data: false
+
+  # Chart-native config already covers DB/OpenSearch/RabbitMQ/Redis for
+  # web/worker pods; only install-init needs an explicit OpenSearch fallback
+  # (chart bug) and S3 needs manual credentials
+  # (no chart-native var exists for it).
+  extraEnvVars:
+    - name: INVENIO_OPENSEARCH_HOST
+      value: "repo-opensearch"
+    - name: INVENIO_OPENSEARCH_PORT
+      value: "9200"
+    # No S3 store included with this chart — point these at your own
+    # (external S3, or a MinIO you deploy separately). Also requires a
+    # manual location-create step after install — see readme.md.
+    # Values come from a Secret you create yourself (see readme.md):
+    #   kubectl create secret generic s3-credentials --namespace invenio \
+    #     --from-literal=endpoint-url="<https://your-s3-endpoint>" \
+    #     --from-literal=access-key="<your-s3-access-key>" \
+    #     --from-literal=secret-key="<your-s3-secret-key>"
+    - name: INVENIO_S3_ENDPOINT_URL
+      valueFrom:
+        secretKeyRef:
+          name: s3-credentials
+          key: endpoint-url
+    - name: INVENIO_S3_ACCESS_KEY
+      valueFrom:
+        secretKeyRef:
+          name: s3-credentials
+          key: access-key
+    - name: INVENIO_S3_SECRET_KEY
+      valueFrom:
+        secretKeyRef:
+          name: s3-credentials
+          key: secret-key
+
+postgresql:
+  auth:
+    password: "invenio-db-pass"
+
+rabbitmq:
+  auth:
+    password: "invenio-mq-pass"
+  clustering:
+    enabled: false  # single replica — avoids the k8s-peer-discovery plugin,
+                     # which can't reach the k8s API from inside a pod on
+                     # some local clusters (crash-loops otherwise)
+
+ingress:
+  enabled: true
+  class: nginx                # matches the IngressClass created by the ingress-nginx controller
+  # TLS secret defaults to "<hostname>-tls" = "localhost-tls" — see readme.md
+
+persistence:
+  access_mode: ReadWriteOnce  # local clusters typically can't provision this chart's default (ReadWriteMany)

@@ -1,0 +1,11 @@
+# Definition of metadata for datasets. Please do not add ccmm model here,
+# add the ccmm_preset instead.
+Metadata:
+  properties:
+    title:
+      type: fulltext+keyword
+    languages:
+      type: array
+      items:
+        type: vocabulary
+        vocabulary-type: languages

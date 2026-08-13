@@ -1,0 +1,43 @@
+[project]
+name = "testrepo"
+version = "1.0.0"
+description = "My Repository description"
+packages = []
+authors = []
+dependencies = [
+    "oarepo[s3,rdm]>=14.0.0b1,<15.0.0",
+    "oarepo-app[ccmm,development]>=6.3.0,<7.0.0",
+]
+requires-python = ">=3.14,<3.15"
+
+[project.entry-points."invenio_assets.webpack"]
+i18n = "i18n.webpack:theme"
+components = "ui.components.webpack:theme"
+ui_datasets = "ui.datasets.webpack:theme"
+
+[project.entry-points."invenio_i18n.translations"]
+translations = "i18n"
+
+[project.entry-points."invenio_db.alembic"]
+repository = "common:alembic"
+
+[project.entry-points."invenio_base.blueprints"]
+ui_datasets = "ui.datasets:create_blueprint"
+
+[project.entry-points."invenio_base.finalize_app"]
+ui_datasets = "ui.datasets:finalize_app"
+
+[tool.uv.build-backend]
+module-root = ""
+module-name = [
+    "common",
+    "i18n",
+    "ui",
+    "models",
+]
+
+[build-system]
+requires = [
+    "uv_build>=0.8.7,<0.9.0",
+]
+build-backend = "uv_build"
