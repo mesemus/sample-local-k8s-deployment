@@ -9,6 +9,10 @@ from oarepo_model.customizations import AddMetadataExport
 from oarepo_model.datatypes.registry import from_yaml
 from ccmm_invenio.models import ccmm_production_preset_1_1_0
 
+from oarepo_communities.model.presets import communities_preset
+from oarepo_requests.model.presets.requests import requests_preset
+from oarepo_workflows.model.presets import workflows_preset
+
 from .serializers import DataCiteJSONSerializer
 
 # TODO: Consider letting users add an image/icon for the model,
@@ -18,16 +22,17 @@ datasets_model = model(
     version="1.0.0",
     description="A generic dataset model",
     presets=[
-
-        ccmm_production_preset_1_1_0
-
+        ccmm_production_preset_1_1_0,
+        workflows_preset,
+        requests_preset,
+        communities_preset,
     ],
     types=[
         from_yaml("metadata.yaml", __file__)
     ],
     metadata_type="Metadata",
     customizations=[
-        # Add your customizations here, such as custom exports and class mixins. 
+        # Add your customizations here, such as custom exports and class mixins.
         # The list of available extensions is at https://github.com/oarepo/oarepo-model.
         # If you do not find a customization that suits your needs or need a
         # help with using customizations, please contact us at support@cesnet.cz and
