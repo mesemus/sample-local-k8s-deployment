@@ -214,3 +214,5 @@ Better long-term: tag builds uniquely (e.g. `docker build -t testrepo:dev-$(date
 -t local/testrepo:dev-$(date +%s) .`) and `helm upgrade` with the new tag
 instead (`helm upgrade -f helm/values-overrides.yaml repo helm-invenio/invenio
 --version 0.14.0 --namespace invenio`), to avoid stale-pod caching issues.
+
+Credits: Martin Muller for contributing to this readme
