@@ -32,6 +32,13 @@ The second tag is required — the chart always renders the image reference
 as `<registry>/<repository>:<tag>`, and `values-overrides.yaml` (next step)
 points it at `local/testrepo:latest`.
 
+If your docker registry is not shared with your k8s installation (for example,
+with minicubes), you might need to import the image:
+
+```bash
+minikube image load local/testrepo:latest
+```
+
 ## 3. Add the chart's Helm repository
 
 ```bash
@@ -60,6 +67,40 @@ kubectl create secret generic s3-credentials --namespace invenio \
   --from-literal=endpoint-url="<https://your-s3-endpoint>" \
   --from-literal=access-key="<your-s3-access-key>" \
   --from-literal=secret-key="<your-s3-secret-key>"
+```
+
+If you have problems with k8s restarting your pods on OOM, try to add this configuration to values-overrides.yaml:
+
+```
+web:
+  replicas: 1
+  uwsgi:
+    processes: 2
+    threads: 2
+  resources:
+    requests:
+      cpu: 250m
+      memory: 512Mi
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+worker:
+  replicas: 1
+  resources:
+    requests:
+      cpu: 250m
+      memory: 500Mi
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+workerBeat:
+  resources:
+    requests:
+      cpu: 250m
+      memory: 400Mi
+    limits:
+      cpu: 1000m
+      memory: 900Mi
 ```
 
 ## 5. Set up HTTPS (ingress + TLS)
